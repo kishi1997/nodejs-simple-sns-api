@@ -14,4 +14,3 @@ export class Post extends BaseEntity {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt?: Date;
 }
-export default Post

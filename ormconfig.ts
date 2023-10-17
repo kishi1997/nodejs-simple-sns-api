@@ -2,7 +2,7 @@ import { ConnectionOptions, LoggerOptions } from 'typeorm'
 
 const ormconfig: ConnectionOptions = {
   type: 'mysql',
-  host: process.env.DB_HOST || 'db',
+  host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT != null ? parseInt(process.env.DB_PORT) : 3306,
   username: process.env.DB_USERNAME || 'mysql',
   password: process.env.DB_PASSWORD || 'password',
