@@ -1,8 +1,10 @@
 import express from 'express';
-import { postContoroller } from './controller/PostContoroller';
+import { PostContoroller } from './controller/PostContoroller';
+import { AccountContoroller } from './controller/AccountContoroller';
 
 const router = express.Router();
 
-router.use('/post', postContoroller);
+router.use('/posts', PostContoroller);
+router.use('/account', AccountContoroller);
 
 export default router;
