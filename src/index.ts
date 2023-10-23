@@ -4,12 +4,8 @@ import express from 'express'
 import 'reflect-metadata'
 import morgan from 'morgan'
 import cors from 'cors'
-import { createConnection } from 'typeorm'
 import router from './router'
-import ormconfig from '../ormconfig'
 import { AppDataSource } from './data-source'
-import { router } from './router';
-import { postContoroller } from './controller/PostContoroller';
 
 const port = Number(process.env.PORT) || 3031
 const app = express();

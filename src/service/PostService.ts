@@ -1,5 +1,5 @@
 import { Post } from "../entity/Post";
-import { getPostRepository } from "../utils/getPostRepository";
+import { getPostRepository } from "../utils/getRepository";
 
 export class PostService {
     static postRepo = getPostRepository();
