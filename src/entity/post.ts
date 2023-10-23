@@ -9,7 +9,7 @@ export class Post extends BaseEntity {
         type: 'varchar',
         length: 300,
     })
-    text?: string;
+    content?: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt?: Date;

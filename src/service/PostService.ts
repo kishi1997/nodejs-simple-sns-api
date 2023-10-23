@@ -4,11 +4,11 @@ import { getPostRepository } from "../utils/getPostRepository";
 export class PostService {
     static postRepo = getPostRepository();
 
-    static async createPost(text:string) {
+    static async createPost(content:string) {
         try {
-            if (!text) return;
+            if (!content) return;
             const newPost = new Post();
-            newPost.text = text;
+            newPost.content = content;
             return await PostService.postRepo.save(newPost);
         } catch (error) {
             return error;

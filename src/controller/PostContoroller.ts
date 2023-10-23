@@ -5,8 +5,8 @@ export const PostContoroller = express.Router();
 
 PostContoroller.post('/', async(req, res) => {
   try {
-    const { text } = req.body;
-    const newPost = await PostService.createPost(text);
+    const { content } = req.body;
+    const newPost = await PostService.createPost(content);
     res.json({ newPost });
   } catch(error) {
     res.send(error);
