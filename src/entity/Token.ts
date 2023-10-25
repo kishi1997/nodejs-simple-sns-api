@@ -12,7 +12,7 @@ export class Token {
     @Column()
     userId?: string;
 
-    @OneToOne(type => User, user => user.token)
+    @OneToOne(() => User, (user) => user.token)
     @JoinColumn()
     user?: User
 }

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, OneToOne } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, OneToMany } from "typeorm"
 import { Token } from "./Token";
+import { Post } from "./Post";
 
 @Entity()
 export class User extends BaseEntity {
@@ -18,8 +19,11 @@ export class User extends BaseEntity {
     @Column({ default: '' })
     iconImageUrl?: string;
 
-    @OneToOne(type => Token, token => token.user,{
+    @OneToOne(() => Token, (token) => token.user,{
         cascade: true,
     })
     token?: Token;
+
+    @OneToMany(() => Post, (post) => post.user)
+    post?: Post[];
 }
