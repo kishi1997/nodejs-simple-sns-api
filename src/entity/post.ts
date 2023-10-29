@@ -1,23 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, IntegerType, } from "typeorm"
 import { User } from "./User";
 
 @Entity()
 export class Post extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id?: string;
+    id?: number;
 
     @Column({
         default: '',
-        type: 'varchar',
-        length: 300,
     })
     body?: string;
 
     @Column()
-    userId?: string;
+    userId?: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt?: Date;
+    createdAt?: string;
 
     @ManyToOne(() => User, (user) => user.post)
     user?: User;
