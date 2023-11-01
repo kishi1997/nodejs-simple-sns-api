@@ -7,26 +7,34 @@ PostContoroller.post('/', async (req, res, next) => {
   try {
     const { post } = req.body;
 
-    if (!post) {
-      return res.status(400).json({ message: 'post required for request parameters' });
-    }
-
     const { body, userId } = post;
 
-    if (!body) {
+    if (body === null || body === undefined) {
+      throw new Error('invalid post');
+    }
+
+    if (body.length === 0) {
       throw new Error('post should not be empty');
     }
-    if (!userId) {
+
+    if (userId === null || userId === undefined) {
+      throw new Error('invalid userId');
+    }
+
+    if (userId === null) {
       throw new Error('userId should not be empty');
+    }
+    if (typeof body !== 'string' || typeof userId !== 'number') {
+      throw new Error('Invalid post data types. Body should be a string and userId should be a number.');
     }
 
     const newPost = await PostService.createPost(body, userId);
     res.json({
       post: {
-      id: newPost.id,
-      body: newPost.body,
-      userId: newPost.userId,
-      createdAt: newPost.createdAt ? new Date(newPost.createdAt).toISOString() : null,
+        id: newPost.id,
+        body: newPost.body,
+        userId: newPost.userId,
+        createdAt: newPost.createdAt ? new Date(newPost.createdAt).toISOString() : null,
       }
     });
   } catch (error) {
