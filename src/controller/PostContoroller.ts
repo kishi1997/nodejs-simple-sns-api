@@ -9,7 +9,7 @@ PostContoroller.post('/', async (req, res, next) => {
 
     const { body, userId } = post;
 
-    if (body == null || body == undefined) {
+    if (body == null) {
       throw new Error('invalid post');
     }
 
@@ -17,7 +17,7 @@ PostContoroller.post('/', async (req, res, next) => {
       throw new Error('post should not be empty');
     }
 
-    if (userId == null || userId == undefined) {
+    if (userId == null) {
       throw new Error('invalid userId');
     }
 

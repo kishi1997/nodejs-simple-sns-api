@@ -8,7 +8,7 @@ UserContoroller.post('/', async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    if (password == null || password == undefined) {
+    if (password == null) {
       throw new Error('Invalid password.');
     }
     if (password.length == 0) {
@@ -18,14 +18,11 @@ UserContoroller.post('/', async (req, res, next) => {
       throw new Error('Password should be at least 8 characters long');
     }
 
-    if (email == null || email == undefined || !validateEmail(email)) {
+    if (email == null || !validateEmail(email)) {
       throw new Error('Invalid email');
     }
-    if (email.length == 0) {
-      throw new Error('Email should not be empty');
-    }
 
-    if (name == null || name == undefined) {
+    if (name == null) {
       throw new Error('Invalid name');
     }
     if (name.length == 0) {
