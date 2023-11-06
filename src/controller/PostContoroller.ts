@@ -13,7 +13,7 @@ PostContoroller.post('/', async (req, res, next) => {
       throw new Error('invalid post');
     }
 
-    if (body.length == 0) {
+    if (body.trim().length === 0) {
       throw new Error('post should not be empty');
     }
 

@@ -11,7 +11,7 @@ UserContoroller.post('/', async (req, res, next) => {
     if (password == null) {
       throw new Error('Invalid password.');
     }
-    if (password.length == 0) {
+    if (password.trim().length == 0) {
       throw new Error('Password should not be empty');
     }
     if (password.length < 8) {
@@ -25,7 +25,7 @@ UserContoroller.post('/', async (req, res, next) => {
     if (name == null) {
       throw new Error('Invalid name');
     }
-    if (name.length == 0) {
+    if (name.trim().length == 0) {
       throw new Error('Name should not be empty');
     }
 
