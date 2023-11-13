@@ -1,12 +1,12 @@
 import * as express from 'express';
-import { UserService } from '../service/UserService'
+import { AuthService } from '../service/AuthService'
 import { validateEmail } from 'src/utils/validateUtils/validateEmail';
 
-export const UserContoroller = express.Router();
+export const AuthContoroller = express.Router();
 
-UserContoroller.post('/', async (req, res, next) => {
+AuthContoroller.post('/', async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { email, password } = req.body;
 
     if (password == null) {
       throw new Error('Invalid password.');
@@ -17,27 +17,19 @@ UserContoroller.post('/', async (req, res, next) => {
     if (password.length < 8) {
       throw new Error('Password should be at least 8 characters long');
     }
-
     if (email == null || !validateEmail(email)) {
       throw new Error('Invalid email');
     }
 
-    if (name == null) {
-      throw new Error('Invalid name');
-    }
-    if (name.trim().length == 0) {
-      throw new Error('Name should not be empty');
-    }
-
-    const userData = await UserService.createUser(name, email, password);
-    const { newUser, token } = userData;
+    const userData = await AuthService.signIn(email, password);
+    const { user, token } = userData;
 
     res.json({
       user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        iconImageUrl: newUser.iconImageUrl,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        iconImageUrl: user.iconImageUrl,
       },
       token: token,
     })
