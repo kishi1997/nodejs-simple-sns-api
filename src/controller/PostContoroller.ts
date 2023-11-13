@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { authAdmin, verifyToken } from 'src/authMiddleware/verifyToken';
+import { authAdmin, verifyToken } from 'src/authMiddleware/auth';
 import { User } from 'src/entity/User';
 import { PostService } from 'src/service/PostService';
 
