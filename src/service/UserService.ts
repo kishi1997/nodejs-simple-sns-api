@@ -1,3 +1,4 @@
+import * as argon2 from 'argon2';
 import { User } from "src/entity/User";
 import { generateToken } from "src/utils/generateToken";
 import { getUserRepository } from "src/utils/getRepository";
@@ -25,7 +26,8 @@ export class UserService {
     if (existingUser) {
       throw new Error('Duplicate Email address');
     }
-    const newUser = UserService.userRepo.create({ name, email, password });
+    const hashedPassword = await argon2.hash(password);
+    const newUser = UserService.userRepo.create({ name, email, password:hashedPassword });
     await UserService.userRepo.save(newUser);
 
     if(newUser.id !== undefined) {
