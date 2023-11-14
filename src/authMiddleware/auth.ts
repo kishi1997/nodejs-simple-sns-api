@@ -9,7 +9,7 @@ declare module 'express' {
 
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.header('authorization')?.split(' ')[1];
     const jwtSecret: string = process.env.JWT_SECRET || 'default-secret';
 
     if (token == null) {

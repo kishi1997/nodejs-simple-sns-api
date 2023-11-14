@@ -1,10 +1,25 @@
+import { validateEmpty } from "src/utils/validateUtils/validateEmpty";
 import { getPostRepository } from "../utils/getRepository";
+import { validateNull } from "src/utils/validateUtils/validateNull";
+import { Post } from "src/entity/Post";
+import { User } from "src/entity/User";
 
 export class PostService {
     static postRepo = getPostRepository();
 
-    static async createPost(body: string, userId: number) {
-        const newPost = PostService.postRepo.create({ body, userId });
-        return await PostService.postRepo.save(newPost);
+    static validatePostData(body: string) {
+        validateNull({name:'Post', value:body});
+        validateEmpty({name: 'Post', value:body.trim()});
+    }
+
+    static async createPost(post: Post, userId: number) {
+        if(post.body !== undefined) {
+            this.validatePostData(post.body);
+        }
+        const newPost = PostService.postRepo.create({ body: post.body, userId });
+        await PostService.postRepo.save(newPost);
+        const user = await User.findOne({ where: { id: userId } });
+        return {newPost, user};
+
     }
 }
