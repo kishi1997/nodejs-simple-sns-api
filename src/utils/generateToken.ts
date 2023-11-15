@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
-import { User } from 'src/entity/User';
 
-export const generateToken = () => {
+export const generateToken = (userId: number) => {
   const payload = {
-    sub: User.name
-    };
-  const secretKey = 'user-secret-key';
-
-  return jwt.sign(payload, secretKey);
+    sub: userId,
+    privilege: 0,
+    issuedAt: new Date().toISOString(),
+  };
+  
+  const jwtSecret: string = process.env.JWT_SECRET || 'default-secret';
+  return jwt.sign(payload, jwtSecret);
 }
