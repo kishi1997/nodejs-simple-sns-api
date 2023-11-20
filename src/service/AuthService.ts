@@ -1,5 +1,6 @@
 import * as argon2 from 'argon2';
 import { User } from "src/entity/User";
+import { createError } from 'src/utils/errorUtils/createError';
 import { generateToken } from "src/utils/generateToken";
 import { getUserRepository } from "src/utils/getRepository";
 import { validateEmail } from "src/utils/validateUtils/validateEmail";
@@ -26,7 +27,7 @@ export class AuthService {
       const token = generateToken(user.id);
       return { user, token };
     } else {
-      throw new Error('User does not exist');
+      throw createError('User does not exist', 401);
     }
   }
 }

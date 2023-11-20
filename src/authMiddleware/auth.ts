@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { createError } from 'src/utils/errorUtils/createError';
 
 declare module 'express' {
   interface Request {
@@ -13,7 +14,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     const jwtSecret: string = process.env.JWT_SECRET || 'default-secret';
 
     if (token == null) {
-        throw new Error('unauthorized user');
+        throw createError('unauthorized user', 401);
     }
     try {
         const decodedToken = jwt.verify(token, jwtSecret);
@@ -22,7 +23,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
         (req as any).userId = userId;
         next();
     } catch (error) {
-        throw new Error('unauthorized user');
+        throw createError('unauthorized user', 401);
     }
 };
 

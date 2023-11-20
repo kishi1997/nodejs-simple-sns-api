@@ -3,6 +3,7 @@ import { getPostRepository } from "../utils/getRepository";
 import { validateNull } from "src/utils/validateUtils/validateNull";
 import { Post } from "src/entity/Post";
 import { User } from "src/entity/User";
+import { createError } from "src/utils/errorUtils/createError";
 
 export class PostService {
     static postRepo = getPostRepository();
@@ -19,7 +20,9 @@ export class PostService {
         const newPost = PostService.postRepo.create({ body: post.body, userId });
         await PostService.postRepo.save(newPost);
         const user = await User.findOne({ where: { id: userId } });
+        if(!user) {
+            throw createError('User does not exist', 401);
+        }
         return {newPost, user};
-
     }
 }
