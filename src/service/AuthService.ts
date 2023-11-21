@@ -27,7 +27,7 @@ export class AuthService {
       const token = generateToken(user.id);
       return { user, token };
     } else {
-      throw createError('User does not exist', 401);
+      throw createError('User does not exist', 422);
     }
   }
 }

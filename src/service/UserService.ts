@@ -25,7 +25,7 @@ export class UserService {
     this.validateUserData(name, email, password);
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
-      throw createError('Duplicate Email address', 409);
+      throw createError('Duplicate Email address', 422);
     }
     const hashedPassword = await argon2.hash(password);
     const newUser = UserService.userRepo.create({ name, email, password:hashedPassword });

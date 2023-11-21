@@ -30,7 +30,7 @@ export class MessageService {
         this.validateMessageData(content, roomId);
         const user = await User.findOne({ where: { id: userId } });
         if(!user) {
-            throw createError('User does not exist', 401);
+            throw createError('User does not exist', 404);
         };
         const newMessage = MessageService.messageRepo.create({ content, roomId, userId });
         await MessageService.messageRepo.save(newMessage);
@@ -42,11 +42,11 @@ export class MessageService {
         if(!user) {
             throw createError('User does not exist', 404);
         };
-        const post = await Post.findOne({ where: { id: postId } });
+        const post = await Post.findOne({ where: { id: postId }, relations: ["user"] });
         if(!post) {
             throw createError('Post does not exist', 404);
         };
-        const postUser = await User.findOne({ where: {id: post.userId}});
+        const postUser = post.user;
         if(!postUser) {
             throw createError('Post User does not exist', 404);
         };
