@@ -1,7 +1,9 @@
-export const validateNull = (...values: { name: string, value: string }[]) => {
+import { createError } from "../errorUtils/createError";
+
+export const validateNull = (...values: { name: string, value: string | number }[]) => {
     values.forEach(({ name, value }) => {
-      if (value.length === 0) {
-        throw new Error(`${name} should not be null`);
+      if (value == null) {
+        throw createError(`${name} should not be null`, 422);
       }
     });
   };

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, IntegerType, } from "typeorm"
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, IntegerType, OneToMany, CreateDateColumn, } from "typeorm"
 import { User } from "./User";
+import { Message } from "./Message";
 
 @Entity()
 export class Post extends BaseEntity {
@@ -14,9 +15,12 @@ export class Post extends BaseEntity {
     @Column()
     userId?: number;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt?: string;
+    @CreateDateColumn()
+    readonly createdDate?: Date
 
     @ManyToOne(() => User, (user) => user.post)
     user?: User;
+
+    @OneToMany(() => Message, (message) => message.post)
+    messages?: Message[];
 }

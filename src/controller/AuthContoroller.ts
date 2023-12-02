@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { AuthService } from '../service/AuthService'
+import { formatUserResponse } from 'src/utils/responseUtils/formatUserResponse';
 
 export const AuthContoroller = express.Router();
 
@@ -8,13 +9,10 @@ AuthContoroller.post('/', async (req, res, next) => {
     const { email, password } = req.body;
     const userData = await AuthService.signIn(email, password);
     const { user, token } = userData;
+    const formattedUserData = formatUserResponse(user);
+
     res.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        iconImageUrl: user.iconImageUrl,
-      },
+      user: formattedUserData,
       token: token,
     })
   } catch (error) {

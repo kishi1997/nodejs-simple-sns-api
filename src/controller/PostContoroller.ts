@@ -1,7 +1,8 @@
 import * as express from 'express';
-import { Request } from 'express';
 import { authAdmin, verifyToken } from 'src/authMiddleware/auth';
 import { PostService } from 'src/service/PostService';
+import { formatPostResponse } from 'src/utils/responseUtils/formatPostResponse';
+import { formatUserResponse } from 'src/utils/responseUtils/formatUserResponse';
 
 export const PostContoroller = express.Router();
 
@@ -10,18 +11,12 @@ PostContoroller.post('/', verifyToken, authAdmin, async (req, res, next) => {
     const { post } = req.body;
     const postData = await PostService.createPost(post, (req as any).userId);
     const {newPost, user} = postData;
+    const formattedUserData = formatUserResponse(user);
+    const formattedPostData = formatPostResponse(newPost);
+
     res.json({
-      post: {
-        id: newPost.id,
-        body: newPost.body,
-        userId: newPost.userId,
-        createdAt: newPost.createdAt ? new Date(newPost.createdAt).toISOString() : null,
-      },
-      user: {
-        id: user?.id,
-        name: user?.name,
-        iconImageUrl: user?.iconImageUrl
-      }
+      post: formattedPostData,
+      user: formattedUserData
     });
   } catch (error) {
   next(error);

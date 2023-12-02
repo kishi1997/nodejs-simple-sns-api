@@ -1,5 +1,6 @@
 import * as argon2 from 'argon2';
 import { User } from "src/entity/User";
+import { createError } from 'src/utils/errorUtils/createError';
 import { generateToken } from "src/utils/generateToken";
 import { getUserRepository } from "src/utils/getRepository";
 import { validateEmail } from "src/utils/validateUtils/validateEmail";
@@ -24,7 +25,7 @@ export class UserService {
     this.validateUserData(name, email, password);
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
-      throw new Error('Duplicate Email address');
+      throw createError('Duplicate Email address', 422);
     }
     const hashedPassword = await argon2.hash(password);
     const newUser = UserService.userRepo.create({ name, email, password:hashedPassword });
@@ -34,7 +35,7 @@ export class UserService {
       const token = generateToken(newUser.id);
       return { newUser, token };
     } else {
-      throw new Error ("User Id is undefined");
+      throw createError('User Id is undefined', 500);
     }
 
   }
