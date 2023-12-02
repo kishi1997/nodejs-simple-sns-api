@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, ManyToOne, UpdateDateColumn, CreateDateColumn, } from "typeorm"
 import { User } from "./User";
 import { Post } from "./Post";
+import { Room } from "./Room";
 
 @Entity()
 export class Message extends BaseEntity {
@@ -30,4 +31,7 @@ export class Message extends BaseEntity {
 
     @ManyToOne(() => Post, (post) => post.messages)
     post?: Post;
+
+    @ManyToOne(() => Room, (room) => room.messages)
+    room?: Room;
 }
