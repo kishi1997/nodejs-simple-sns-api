@@ -25,8 +25,8 @@ MessageContoroller.post('/', verifyToken, authAdmin, async (req, res, next) => {
 
 MessageContoroller.post('/via_post', verifyToken, authAdmin, async (req, res, next) => {
   try {
-    const { content, roomId, postId } = req.body;
-    const messageViaPostData = await MessageService.createMessageViaPost(content, roomId, postId, (req as any).userId);
+    const { content, postId } = req.body;
+    const messageViaPostData = await MessageService.createMessageViaPost(content, postId, (req as any).userId);
     const { user, post, postUser, newMessage } = messageViaPostData;
     const formattedMessageData = formatMessageResponse(newMessage);
     const formattedUserData = formatUserResponse(user);
