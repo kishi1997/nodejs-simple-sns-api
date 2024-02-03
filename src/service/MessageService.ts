@@ -53,11 +53,11 @@ export class MessageService {
       where: { id: postId },
       relations: ['user'],
     })
-    if (!post) {
+    if (post == null) {
       throw createError('Post does not exist', 422)
     }
     const postUser = post.user
-    if (!postUser) {
+    if (postUser == null) {
       throw createError('Post User does not exist', 400)
     }
     const newMessage = MessageService.messageRepo.create({

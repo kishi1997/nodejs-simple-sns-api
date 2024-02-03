@@ -21,13 +21,13 @@ export class RoomService {
       where: Array.from(allUserIds).map(id => ({ id })),
     })
 
-    if (!roomUsers) {
+    if (roomUsers == null) {
       throw createError('User does not exist', 422)
     }
     const existingRoom = await Room.findOne({
       where: { usersId: formattedUserIds },
     })
-    if (existingRoom) {
+    if (existingRoom !== null) {
       throw createError('Duplicate entry', 422)
     }
     const newRoom = RoomService.roomRepo.create({ usersId: formattedUserIds })

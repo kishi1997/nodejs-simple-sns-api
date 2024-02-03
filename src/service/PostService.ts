@@ -20,7 +20,7 @@ export class PostService {
     const newPost = PostService.postRepo.create({ body: post.body, userId })
     await PostService.postRepo.save(newPost)
     const user = await User.findOne({ where: { id: userId } })
-    if (!user) {
+    if (user == null) {
       throw createError('User does not exist', 400)
     }
     return { newPost, user }

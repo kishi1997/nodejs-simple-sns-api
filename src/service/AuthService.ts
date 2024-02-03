@@ -25,12 +25,12 @@ export class AuthService {
   static async signIn(email: string, password: string) {
     this.validateUserData(email, password)
     const user = await User.findOne({ where: { email } })
-    if (!user) {
+    if (user == null) {
       throw createError('User does not exist', 422)
     }
     if (
-      user.password &&
-      user.id &&
+      user.password !== undefined &&
+      user.id !== undefined &&
       (await argon2.verify(user.password, password))
     ) {
       const token = generateToken(user.id)
