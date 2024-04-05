@@ -1,29 +1,46 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, OneToMany } from "typeorm"
-import { Post } from "./Post";
-import { Message } from "./Message";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  OneToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { Post } from './Post'
+import { Message } from './Message'
+import { RoomUser } from './RoomUser'
 
 @Entity()
 export class User extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number
 
-    @Column()
-    name?: string;
+  @Column()
+  name?: string
 
-    @Column()
-    email?: string;
+  @Column()
+  email?: string
 
-    @Column()
-    password?: string;
+  @Column()
+  password?: string
 
-    @Column({ default: '' })
-    iconImageUrl?: string;
+  @Column({ default: '' })
+  iconImageUrl?: string
 
-    @OneToMany(() => Post, (post) => post.user)
-    post?: Post[];
+  @CreateDateColumn()
+  readonly createdDate?: Date
 
-    @OneToMany(() => Message, (message) => message.user, {
-        cascade: true,
-    })
-    messages?: Message[];
+  @UpdateDateColumn()
+  readonly updatedDate?: Date
+
+  @OneToMany(() => Post, post => post.user)
+  post?: Post[]
+
+  @OneToMany(() => Message, message => message.user)
+  messages?: Message[]
+
+  @OneToOne(() => RoomUser, roomUser => roomUser.user)
+  room_user?: RoomUser[]
 }
