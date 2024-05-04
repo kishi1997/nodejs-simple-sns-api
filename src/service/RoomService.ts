@@ -4,7 +4,9 @@ import {
   getRoomRepository,
   getRoomUserRepository,
 } from 'src/utils/getRepository'
-import { generateRoomInfo } from 'src/utils/roomUtils'
+import { getMessages } from 'src/utils/messageUtils/getMessageData'
+import { generateResponseRoomUsersInfo } from 'src/utils/roomUserUtils/generateResponseRoomUsersInfo'
+import { getRoomUsers } from 'src/utils/roomUserUtils/getRoomUsersData'
 import { validateUser } from 'src/utils/validateUtils/validateUser'
 
 export class RoomService {
@@ -29,7 +31,7 @@ export class RoomService {
     }
     const newRoom = this.roomRepo.create({ usersId: formattedUserIds })
     await this.roomRepo.save(newRoom)
-    // roomUserテーブルにuser登録
+    // roomUserテーブルにユーザー登録
     await Promise.all(
       allUserIds.map(async userId => {
         const roomUser = this.roomUserRepo.create({
@@ -39,6 +41,16 @@ export class RoomService {
         await this.roomUserRepo.save(roomUser)
       })
     )
-    return await generateRoomInfo(newRoom)
+    // 作成したルームに関連するユーザーとメッセージを取得
+    const [roomUsers, messages] = await Promise.all([
+      getRoomUsers(newRoom),
+      getMessages(newRoom),
+    ])
+    const roomUsersInfo = await generateResponseRoomUsersInfo(roomUsers)
+    return {
+      id: newRoom.id,
+      messages,
+      roomUsers: roomUsersInfo,
+    }
   }
 }
