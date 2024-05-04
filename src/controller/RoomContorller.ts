@@ -7,13 +7,7 @@ RoomController.post('/', verifyToken, authAdmin, async (req, res, next) => {
   try {
     const { userIds } = req.body
     const roomData = await RoomService.createRoom(userIds, (req as any).userId)
-    const { roomInfo } = roomData
-
-    const responseData = {
-      room: roomInfo,
-    }
-
-    res.json(responseData)
+    res.json({ room: roomData })
   } catch (error) {
     next(error)
   }

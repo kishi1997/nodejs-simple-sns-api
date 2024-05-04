@@ -14,9 +14,11 @@
     "console": "NODE_OPTIONS=--experimental-repl-await yarn ts-node console.ts"
   },
   "dependencies": {
+    "argon2": "^0.40.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
