@@ -1,5 +1,3 @@
-import { Room } from 'src/entity/Room'
-import { createError } from 'src/utils/errorUtils/createError'
 import {
   getRoomRepository,
   getRoomUserRepository,
