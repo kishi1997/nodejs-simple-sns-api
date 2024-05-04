@@ -1,18 +1,17 @@
-import { createError } from '../errorUtils/createError'
-import { RoomUser } from 'src/entity/RoomUser'
 import { formatUserResponseWithoutEmail } from '../responseUtils/formatUserResponse'
+import { User } from 'src/entity/User'
+import { Room } from 'src/entity/Room'
 
 // ルーム作成時に返すルームユーザーデータを取得及び整形
-export const generateResponseRoomUsersInfo = async (roomUsers: RoomUser[]) => {
+export const generateResponseRoomUsersInfo = async (
+  roomUsers: User[],
+  newRoom: Room
+) => {
   const roomUsersInfo = roomUsers.map(roomUserData => {
-    const { user, roomId } = roomUserData
-    if (user == null) {
-      throw createError('Failed to create roomUsers info', 422)
-    }
-    const formatUserResponse = formatUserResponseWithoutEmail(user)
+    const formatUserResponse = formatUserResponseWithoutEmail(roomUserData)
     return {
-      userId: user.id,
-      roomId,
+      userId: roomUserData.id,
+      roomId: newRoom.id,
       user: formatUserResponse,
     }
   })
