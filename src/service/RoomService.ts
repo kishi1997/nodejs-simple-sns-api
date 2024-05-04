@@ -3,7 +3,7 @@ import {
   getRoomUserRepository,
 } from 'src/utils/getRepository'
 import { getMessages } from 'src/utils/messageUtils/getMessageData'
-import { generateResponseRoomUsersInfo } from 'src/utils/roomUserUtils/generateResponseRoomUsersInfo'
+import { generateResponseRoomUsersInfo } from 'src/utils/roomUtils/generateResponseRoomUsersInfo'
 import { createNewRoom } from 'src/utils/roomUtils/createNewRoom'
 import { getUserData } from 'src/utils/userUtils/getUserData'
 
