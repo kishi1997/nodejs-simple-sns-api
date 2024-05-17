@@ -19,18 +19,13 @@ export class RoomService {
       where: { id: newRoom.id },
       relations: ['messages'],
     })
-    // roomUserテーブルにユーザー登録
-    const roomUserRegistrationData = allUserIds.map((userId: number) => {
-      return {
+    const roomUserRegistrationData = allUserIds.map((userId: number) =>
+      RoomUser.create({
         userId: userId,
         roomId: newRoom.id,
-      }
-    })
-    await RoomUser.createQueryBuilder()
-      .insert()
-      .into(RoomUser)
-      .values(roomUserRegistrationData)
-      .execute()
+      })
+    )
+    await RoomUser.save(roomUserRegistrationData)
 
     const roomUsers = await RoomUser.createQueryBuilder('roomUser')
       .leftJoinAndSelect('roomUser.user', 'user')
