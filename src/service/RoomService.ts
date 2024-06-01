@@ -2,10 +2,8 @@ import {
   getRoomRepository,
   getRoomUserRepository,
 } from 'src/utils/getRepository'
-import { createNewRoom } from 'src/utils/roomUtils/createNewRoom'
-import { RoomUser } from 'src/entity/RoomUser'
 import { Room } from 'src/entity/Room'
-
+import { createError } from 'src/utils/errorUtils/createError'
 export class RoomService {
   static roomRepo = getRoomRepository()
   static roomUserRepo = getRoomUserRepository()
@@ -14,35 +12,42 @@ export class RoomService {
     const formattedUserIds = Array.from(allUserIds)
       .sort((a, b) => a - b)
       .join('-')
-    const newRoom = await createNewRoom(formattedUserIds)
-    const roomWithMessages = await Room.findOne({
-      where: { id: newRoom.id },
-      relations: ['messages'],
+    const existingRoom = await Room.findOne({
+      where: { usersId: formattedUserIds },
     })
-    const roomUserRegistrationData = allUserIds.map((userId: number) =>
-      RoomUser.create({
+    if (existingRoom !== null) {
+      throw createError('Duplicate entry', 422)
+    }
+    const newRoom = this.roomRepo.create({ usersId: formattedUserIds })
+    newRoom.room_user = allUserIds.map((userId: number) =>
+      this.roomUserRepo.create({
         userId: userId,
         roomId: newRoom.id,
       })
     )
-    await RoomUser.save(roomUserRegistrationData)
-
-    const roomUsers = await RoomUser.createQueryBuilder('roomUser')
-      .leftJoinAndSelect('roomUser.user', 'user')
-      .select([
-        'roomUser.roomId',
-        'roomUser.userId',
-        'user.id',
-        'user.name',
-        'user.iconImageUrl',
-      ])
-      .where('roomUser.roomId = :roomId', { roomId: newRoom.id })
-      .getMany()
-
+    await this.roomRepo.save(newRoom)
+    const roomWithRelations = await Room.findOne({
+      where: { id: newRoom.id },
+      relations: ['messages', 'room_user', 'room_user.user'],
+    })
     return {
       id: newRoom.id,
-      messages: roomWithMessages?.messages,
-      roomUsers: roomUsers,
+      messages:
+        roomWithRelations?.messages != null ? roomWithRelations?.messages : [],
+      roomUsers:
+        roomWithRelations?.room_user != null
+          ? roomWithRelations?.room_user.map(x => {
+              return {
+                roomId: x.roomId,
+                userId: x.userId,
+                user: {
+                  id: x.user?.id,
+                  name: x.user?.name,
+                  iconImageUrl: x.user?.iconImageUrl,
+                },
+              }
+            })
+          : [],
     }
   }
 }
