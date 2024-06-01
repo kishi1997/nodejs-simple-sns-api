@@ -19,13 +19,14 @@ export class RoomService {
       throw createError('Duplicate entry', 422)
     }
     const newRoom = this.roomRepo.create({ usersId: formattedUserIds })
-    newRoom.room_user = allUserIds.map((userId: number) =>
+    await this.roomRepo.save(newRoom)
+    const roomUserRegistrationData = allUserIds.map((userId: number) =>
       this.roomUserRepo.create({
         userId: userId,
         roomId: newRoom.id,
       })
     )
-    await this.roomRepo.save(newRoom)
+    await this.roomUserRepo.save(roomUserRegistrationData)
     const roomWithRelations = await Room.findOne({
       where: { id: newRoom.id },
       relations: ['messages', 'room_user', 'room_user.user'],
