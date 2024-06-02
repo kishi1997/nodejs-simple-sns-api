@@ -32,7 +32,7 @@ export class RoomService {
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
     if (roomWithRelations == null) {
-      throw createError('New room does not exist', 400)
+      throw createError('New room does not exist', 422)
     }
     return roomWithRelations
   }
