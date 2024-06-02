@@ -32,8 +32,32 @@ export class RoomService {
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
     if (roomWithRelations == null) {
-      throw createError('New room does not exist', 400)
+      throw createError('New room does not exist', 422)
     }
     return roomWithRelations
+  }
+  static async getRooms() {
+    const rooms = await Room.createQueryBuilder('room')
+      .leftJoinAndSelect('room.messages', 'message')
+      .leftJoinAndSelect('room.roomUsers', 'roomUser')
+      .leftJoinAndSelect('roomUser.user', 'user')
+      .groupBy('room.id, message.id, roomUser.id, user.id')
+      .orderBy('MAX(message.createdDate)', 'DESC')
+      .getMany()
+
+    if (rooms == null) {
+      throw createError('Rooms do not exist', 422)
+    }
+    return rooms
+  }
+  static async findRoom(roomId: string) {
+    const room = await Room.findOne({
+      where: { id: roomId },
+      relations: ['messages', 'roomUsers', 'roomUsers.user'],
+    })
+    if (room == null) {
+      throw createError('Room does not exist', 422)
+    }
+    return room
   }
 }
