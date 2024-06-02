@@ -29,26 +29,11 @@ export class RoomService {
     await this.roomUserRepo.save(roomUserRegistrationData)
     const roomWithRelations = await Room.findOne({
       where: { id: newRoom.id },
-      relations: ['messages', 'room_user', 'room_user.user'],
+      relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
-    return {
-      id: newRoom.id,
-      messages:
-        roomWithRelations?.messages != null ? roomWithRelations?.messages : [],
-      roomUsers:
-        roomWithRelations?.room_user != null
-          ? roomWithRelations?.room_user.map(x => {
-              return {
-                roomId: x.roomId,
-                userId: x.userId,
-                user: {
-                  id: x.user?.id,
-                  name: x.user?.name,
-                  iconImageUrl: x.user?.iconImageUrl,
-                },
-              }
-            })
-          : [],
+    if (roomWithRelations == null) {
+      throw createError('New room does not exist', 400)
     }
+    return roomWithRelations
   }
 }
