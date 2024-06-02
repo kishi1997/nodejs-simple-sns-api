@@ -27,9 +27,9 @@ export class RoomUser extends BaseEntity {
   @UpdateDateColumn()
   readonly updatedDate?: Date
 
-  @ManyToOne(() => Room, room => room.room_user)
+  @ManyToOne(() => Room, room => room.roomUsers)
   room?: Room
 
-  @ManyToOne(() => User, user => user.room_user)
+  @ManyToOne(() => User, user => user.roomUsers)
   user?: User
 }
