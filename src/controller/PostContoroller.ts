@@ -37,21 +37,3 @@ PostContoroller.get('/:id', verifyToken, authAdmin, async (req, res, next) => {
     next(error)
   }
 })
-PostContoroller.delete(
-  '/:id',
-  verifyToken,
-  authAdmin,
-  async (req, res, next) => {
-    try {
-      const postId = req.params.id
-      const postIdNumber = parseInt(postId, 10)
-      const result = await Post.delete({ id: postIdNumber })
-      if (result.affected == null || result.affected === 0) {
-        throw createError('Failed to delete post', 422)
-      }
-      res.json({ success: true })
-    } catch (error) {
-      next(error)
-    }
-  }
-)
