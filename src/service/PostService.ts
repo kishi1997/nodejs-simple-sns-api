@@ -24,7 +24,7 @@ export class PostService {
       relations: ['user'],
     })
     if (newPostData == null) {
-      throw createError('New Post does not exist', 422)
+      throw createError('New Post does not exist', 404)
     }
     return newPostData
   }
@@ -58,8 +58,16 @@ export class PostService {
       relations: ['user'],
     })
     if (post == null) {
-      throw createError('Post does not exist', 400)
+      throw createError('Post does not exist', 404)
     }
     return post
+  }
+  static async deletePost(postId: number, userId: number) {
+    const post = await this.postRepo.findOne({ where: { id: postId, userId } })
+    if (post == null) {
+      throw createError('Failed to delete post', 404)
+    }
+    await Post.delete({ id: postId })
+    return
   }
 }
