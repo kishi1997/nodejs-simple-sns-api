@@ -11,3 +11,7 @@ export type FindParams = {
   pagination?: PaginationParams
   filter?: FilterParams
 }
+export type FindMessagesParams = {
+  pagination?: PaginationParams
+  roomId?: string
+}
