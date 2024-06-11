@@ -46,7 +46,7 @@ export class RoomService {
       .getMany()
 
     if (rooms == null) {
-      throw createError('Rooms do not exist', 422)
+      throw createError('Rooms do not exist', 404)
     }
     return rooms
   }
@@ -56,7 +56,7 @@ export class RoomService {
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
     if (room == null) {
-      throw createError('Room does not exist', 422)
+      throw createError('Room does not exist', 404)
     }
     return room
   }
