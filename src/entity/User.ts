@@ -42,5 +42,5 @@ export class User extends BaseEntity {
   messages?: Message[]
 
   @OneToOne(() => RoomUser, roomUser => roomUser.user)
-  room_user?: RoomUser[]
+  roomUsers?: RoomUser[]
 }

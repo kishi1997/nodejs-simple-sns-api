@@ -29,5 +29,5 @@ export class Room extends BaseEntity {
   messages?: Message[]
 
   @OneToMany(() => RoomUser, roomUser => roomUser.room)
-  room_user?: RoomUser[]
+  roomUsers?: RoomUser[]
 }
