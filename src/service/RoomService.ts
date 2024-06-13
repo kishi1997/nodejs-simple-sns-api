@@ -60,13 +60,10 @@ export class RoomService {
     await RoomUser.findOneOrFail({
       where: { roomId, userId },
     })
-    // ルームデータおよび関連するメッセージとユーザーを取得
-    const room = await Room.createQueryBuilder('room')
-      .leftJoinAndSelect('room.messages', 'message')
-      .leftJoinAndSelect('room.roomUsers', 'roomUser')
-      .leftJoinAndSelect('roomUser.user', 'user')
-      .where('room.id = :roomId', { roomId })
-      .getOneOrFail()
+    const room = await Room.findOneOrFail({
+      where: { id: roomId },
+      relations: ['messages', 'roomUsers', 'roomUsers.user'],
+    })
     return room
   }
 }
