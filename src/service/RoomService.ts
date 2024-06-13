@@ -44,20 +44,13 @@ export class RoomService {
       .groupBy('room.id, message.id, roomUser.id, user.id')
       .orderBy('MAX(message.createdDate)', 'DESC')
       .getMany()
-
-    if (rooms == null) {
-      throw createError('Rooms do not exist', 404)
-    }
     return rooms
   }
   static async findRoom(roomId: string) {
-    const room = await Room.findOne({
+    const room = await Room.findOneOrFail({
       where: { id: roomId },
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
-    if (room == null) {
-      throw createError('Room does not exist', 404)
-    }
     return room
   }
 }
