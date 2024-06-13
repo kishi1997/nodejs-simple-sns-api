@@ -16,7 +16,7 @@ RoomController.post('/', verifyToken, authAdmin, async (req, res, next) => {
 })
 RoomController.get('/', verifyToken, authAdmin, async (req, res, next) => {
   try {
-    const roomDatas = await RoomService.getRooms()
+    const roomDatas = await RoomService.getRooms((req as any).userId)
     res.json({
       rooms: roomDatas.map((roomData: Room) => {
         return formatRoomResponse(roomData)
@@ -29,7 +29,7 @@ RoomController.get('/', verifyToken, authAdmin, async (req, res, next) => {
 RoomController.get('/:id', verifyToken, authAdmin, async (req, res, next) => {
   try {
     const roomId = req.params.id
-    const roomData = await RoomService.findRoom(roomId)
+    const roomData = await RoomService.findRoom(roomId, (req as any).userId)
     res.json({ room: formatRoomResponse(roomData) })
   } catch (error) {
     next(error)
