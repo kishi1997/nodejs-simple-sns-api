@@ -19,13 +19,10 @@ export class PostService {
     }
     const newPost = PostService.postRepo.create({ body: post.body, userId })
     await PostService.postRepo.save(newPost)
-    const newPostData = await Post.findOne({
+    const newPostData = await Post.findOneOrFail({
       where: { id: newPost.id },
       relations: ['user'],
     })
-    if (newPostData == null) {
-      throw createError('New Post does not exist', 422)
-    }
     return newPostData
   }
   static async getPosts(params: FindParams) {
@@ -39,27 +36,20 @@ export class PostService {
     const order = params.pagination?.order === 'ASC' ? 'ASC' : 'DESC'
     const userId = params.filter?.userId
     const comparison = isNext ? '<' : '>'
+    // 初期値のあるデータを指定
     let query = Post.createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .orderBy('post.id', order)
       .limit(size)
+    // undefined許容のデータをundefinedではない場合のみ指定
     if (userId !== undefined) {
       query = query.where('post.userId = :userId', { userId })
     }
     if (cursor !== undefined) {
       query = query.andWhere('post.id ' + comparison + ' :cursor', { cursor })
     }
+    // 条件に一致するpostを取得
     const posts = await query.getMany()
     return posts
-  }
-  static async findPost(postId: number) {
-    const post = await Post.findOne({
-      where: { id: postId },
-      relations: ['user'],
-    })
-    if (post == null) {
-      throw createError('Post does not exist', 400)
-    }
-    return post
   }
 }
