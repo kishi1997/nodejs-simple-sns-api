@@ -27,14 +27,15 @@ export class PostService {
   }
   static async getPosts(params: FindParams) {
     // cursor,isNext,sizeにはundefinedの場合、初期値を設定
-    const cursor = params.pagination?.cursor
-    const isNext: boolean =
-      params.pagination?.isNext === undefined
-        ? true
-        : params.pagination?.isNext !== false
-    const size = params.pagination?.size ? params.pagination?.size : 50
-    const order = params.pagination?.order === 'ASC' ? 'ASC' : 'DESC'
-    const userId = params.filter?.userId
+    const {
+      pagination: {
+        cursor = undefined,
+        isNext = true,
+        size = 50,
+        order = 'DESC',
+      } = {},
+      filter: { userId = undefined } = {},
+    } = params
     const comparison = isNext ? '<' : '>'
     // 初期値のあるデータを指定
     let query = Post.createQueryBuilder('post')
