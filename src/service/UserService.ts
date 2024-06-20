@@ -15,8 +15,8 @@ export class UserService {
   static validateUserData(name: string, email: string, password: string) {
     validateNull(
       { name: 'Name', value: name, status: 422 },
-      { name: 'Email', value: email, status: 400 },
-      { name: 'Password', value: password, status: 400 }
+      { name: 'Email', value: email, status: 422 },
+      { name: 'Password', value: password, status: 422 }
     )
     validateEmpty({ name: 'Name', value: name.trim(), status: 422 })
     validatePasswordLength({
