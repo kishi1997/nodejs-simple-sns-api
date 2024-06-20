@@ -11,7 +11,7 @@ PostContoroller.post(
   '/',
   verifyToken,
   authAdmin,
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { post } = req.body
       const userId = req.userId
@@ -30,7 +30,7 @@ PostContoroller.get(
   '/',
   verifyToken,
   authAdmin,
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const posts = await PostService.getPosts(req.query)
       const formattedPostsData = posts.map((post: Post) => {

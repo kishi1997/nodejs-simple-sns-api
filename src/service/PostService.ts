@@ -12,7 +12,7 @@ export class PostService {
     validateEmpty({ name: 'Post', value: body.trim(), status: 422 })
   }
 
-  static async createPost(post: Post, userId: number) {
+  static async createPost(post: Post, userId: number): Promise<Post> {
     if (post.body !== undefined) {
       this.validatePostData(post.body)
     }
@@ -24,23 +24,23 @@ export class PostService {
     })
     return newPostData
   }
-  static async getPosts(params: GetPostsParams) {
+  static async getPosts(params: GetPostsParams): Promise<Post[]> {
     // cursor,isNext,sizeにはundefinedの場合、初期値を設定
     const {
       pagination: { cursor, isNext = true, size = 50, order = 'DESC' } = {},
       filter: { userId } = {},
     } = params
-    const comparison = isNext ? '<' : '>'
-    // 初期値のあるデータを指定
+    // 初期値のあるデータをメソッドで指定
     let query = Post.createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .orderBy('post.id', order)
       .limit(size)
-    // undefined許容のデータをundefinedではない場合に指定
+    // userId又はcursorデータがundefinedではない場合にクエリーにメソッドを追加
     if (userId !== undefined) {
       query = query.where('post.userId = :userId', { userId })
     }
     if (cursor !== undefined) {
+      const comparison = isNext ? '<' : '>'
       query = query.andWhere('post.id ' + comparison + ' :cursor', { cursor })
     }
     const posts = await query.getMany()
