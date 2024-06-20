@@ -26,14 +26,11 @@ export class UserService {
     })
     validateEmail(email)
   }
-  static async getAccount(userId: number) {
-    const user = await User.findOne({ where: { id: userId } })
-    if (user == null) {
-      throw createError('Account does not exist', 422)
-    }
-    return user
-  }
-  static async createUser(name: string, email: string, password: string) {
+  static async createUser(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{ newUser: User; token: string }> {
     this.validateUserData(name, email, password)
     const existingUser = await User.findOne({ where: { email: email } })
     if (existingUser) {
@@ -58,19 +55,18 @@ export class UserService {
     name?: string,
     email?: string,
     url?: string
-  ) {
+  ): Promise<User> {
     if (email) validateEmail(email)
     const updatedUserData = await this.userRepo.update(
       { id: userId },
       { name: name, email: email, iconImageUrl: url }
     )
     if (updatedUserData.affected === 0) {
-      throw createError('User not found or update failed', 404)
+      throw createError('Update failed', 404)
     }
-    const userData = await this.userRepo.findOne({ where: { id: userId } })
-    if (userData == null) {
-      throw createError('User does not exist', 404)
-    }
+    const userData = await this.userRepo.findOneOrFail({
+      where: { id: userId },
+    })
     return userData
   }
 }
