@@ -46,7 +46,7 @@ PostContoroller.get(
     try {
       const postId = parseInt(req.params.id)
       const post = await PostService.findPost(postId)
-      res.json({ posts: formatPostResponse(post) })
+      res.json({ post: formatPostResponse(post) })
     } catch (error) {
       next(error)
     }
