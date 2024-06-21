@@ -15,11 +15,7 @@ PostContoroller.post(
     try {
       const { post } = req.body
       const userId = req.userId
-      if (userId == null) {
-        res.json({ user: null })
-        return
-      }
-      const newPost = await PostService.createPost(post, userId)
+      const newPost = await PostService.createPost(post, userId!)
       res.json({ post: formatPostResponse(newPost) })
     } catch (error) {
       next(error)
