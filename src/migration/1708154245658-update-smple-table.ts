@@ -12,19 +12,13 @@ export class UpdateSmpleTable1708154245658 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`message\` DROP COLUMN \`updatedAt\``);
         await queryRunner.query(`ALTER TABLE \`message\` ADD \`createdDate\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)`);
         await queryRunner.query(`ALTER TABLE \`message\` ADD \`updatedDate\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)`);
-        await queryRunner.query(`ALTER TABLE \`message\` DROP FOREIGN KEY \`FK_04a090968149bb6f728a253d683\``);
-        await queryRunner.query(`ALTER TABLE \`message\` CHANGE \`postId\` \`postId\` int NULL`);
         await queryRunner.query(`ALTER TABLE \`room_user\` ADD CONSTRAINT \`FK_507b03999779b22e06538595dec\` FOREIGN KEY (\`roomId\`) REFERENCES \`room\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`room_user\` ADD CONSTRAINT \`FK_27dad61266db057665ee1b13d3d\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`message\` ADD CONSTRAINT \`FK_04a090968149bb6f728a253d683\` FOREIGN KEY (\`postId\`) REFERENCES \`post\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`message\` DROP FOREIGN KEY \`FK_04a090968149bb6f728a253d683\``);
         await queryRunner.query(`ALTER TABLE \`room_user\` DROP FOREIGN KEY \`FK_27dad61266db057665ee1b13d3d\``);
         await queryRunner.query(`ALTER TABLE \`room_user\` DROP FOREIGN KEY \`FK_507b03999779b22e06538595dec\``);
-        await queryRunner.query(`ALTER TABLE \`message\` CHANGE \`postId\` \`postId\` int NOT NULL DEFAULT '0'`);
-        await queryRunner.query(`ALTER TABLE \`message\` ADD CONSTRAINT \`FK_04a090968149bb6f728a253d683\` FOREIGN KEY (\`postId\`) REFERENCES \`post\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`message\` DROP COLUMN \`updatedDate\``);
         await queryRunner.query(`ALTER TABLE \`message\` DROP COLUMN \`createdDate\``);
         await queryRunner.query(`ALTER TABLE \`message\` ADD \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP`);
