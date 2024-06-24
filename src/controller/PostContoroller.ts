@@ -38,3 +38,17 @@ PostContoroller.get(
     }
   }
 )
+PostContoroller.get(
+  '/:id',
+  verifyToken,
+  authAdmin,
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const postId = parseInt(req.params.id)
+      const post = await PostService.findPost(postId)
+      res.json({ post: formatPostResponse(post) })
+    } catch (error) {
+      next(error)
+    }
+  }
+)

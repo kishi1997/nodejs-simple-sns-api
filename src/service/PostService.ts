@@ -51,4 +51,11 @@ export class PostService {
     const posts = await query.getMany()
     return posts
   }
+  static async findPost(postId: number): Promise<Post> {
+    const post = await Post.findOneOrFail({
+      where: { id: postId },
+      relations: ['user'],
+    })
+    return post
+  }
 }
