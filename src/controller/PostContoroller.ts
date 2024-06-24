@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express'
 import { authAdmin, verifyToken } from 'src/authMiddleware/auth'
 import { Post } from 'src/entity/Post'
 import { PostService } from 'src/service/PostService'
-import { createError } from 'src/utils/errorUtils/createError'
 import { formatPostResponse } from 'src/utils/responseUtils/formatPostResponse'
 
 export const PostContoroller = express.Router()

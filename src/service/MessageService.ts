@@ -1,43 +1,19 @@
 import { getMessageRepository, getRoomRepository } from '../utils/getRepository'
 import { Post } from 'src/entity/Post'
 import { createError } from 'src/utils/errorUtils/createError'
-import { FindMessagesParams } from 'src/types/params.type'
 import { Message } from 'src/entity/Message'
 import { RoomUser } from 'src/entity/RoomUser'
-import { RoomService } from './RoomService'
+import { PaginationParams } from 'src/types/paginationParams.type'
+import { applyPagination } from 'src/utils/paginationUtils'
+import { validateNull } from 'src/utils/validateUtils/validateNull'
 
+type GetMessagesParams = {
+  pagination?: PaginationParams
+  roomId?: string
+}
 export class MessageService {
   static messageRepo = getMessageRepository()
   static roomRepo = getRoomRepository()
-
-  static async getMessages(params: FindMessagesParams) {
-    // cursor,isNext,sizeにはundefinedの場合、初期値を設定
-    const cursor = params.pagination?.cursor
-    const isNext: boolean =
-      params.pagination?.isNext === undefined
-        ? true
-        : params.pagination?.isNext !== false
-    const size = params.pagination?.size ? params.pagination?.size : 50
-    const order = params.pagination?.order === 'ASC' ? 'ASC' : 'DESC'
-    const roomId = params.roomId
-    const comparison = isNext ? '<' : '>'
-    let query = Message.createQueryBuilder('message')
-      .leftJoinAndSelect('message.user', 'messageUser')
-      .leftJoinAndSelect('message.post', 'post')
-      .leftJoinAndSelect('post.user', 'postUser')
-      .orderBy('message.id', order)
-      .limit(size)
-    if (roomId !== undefined) {
-      query = query.where('message.roomId = :roomId', { roomId })
-    }
-    if (cursor !== undefined) {
-      query = query.andWhere('message.id ' + comparison + ' :cursor', {
-        cursor,
-      })
-    }
-    const messages = await query.getMany()
-    return messages
-  }
 
   static async createMessage(content: string, roomId: string, userId: number) {
     const roomUsers = await RoomUser.find({
@@ -54,13 +30,10 @@ export class MessageService {
       userId,
     })
     await this.messageRepo.save(newMessage)
-    const newMessageData = await this.messageRepo.findOne({
+    const newMessageData = await this.messageRepo.findOneOrFail({
       where: { id: newMessage.id },
       relations: ['user'],
     })
-    if (newMessageData == null) {
-      throw createError('Message data does not exist', 422)
-    }
     return newMessageData
   }
   static async createMessageViaPost(
@@ -69,28 +42,18 @@ export class MessageService {
     userId: number
   ) {
     // post取得
-    const post = await Post.findOne({
+    const post = await Post.findOneOrFail({
       where: { id: postId },
       relations: ['user'],
     })
-    if (post == null || post.user == null) {
-      throw createError(
-        post == null ? 'Post does not exist' : 'Post User does not exist',
-        422
-      )
-    }
-    const userIds = [post.user.id as number, userId]
+    const userIds = [post.user?.id as number, userId]
     const formattedUserIds = Array.from(userIds)
       .sort((a, b) => a - b)
       .join('-')
     // ルームの取得
-    let room = await this.roomRepo.findOne({
+    let room = await this.roomRepo.findOneOrFail({
       where: { usersId: formattedUserIds },
     })
-    if (room == null) {
-      room = await RoomService.createRoom(userIds, userId)
-    }
-
     // メッセージの作成と保存
     const newMessage = this.messageRepo.create({
       content,
@@ -99,16 +62,26 @@ export class MessageService {
       roomId: room.id,
     })
     await this.messageRepo.save(newMessage)
-
     // メッセージデータの取得
-    const newMessageData = await this.messageRepo.findOne({
+    const newMessageData = await this.messageRepo.findOneOrFail({
       where: { id: newMessage.id },
       relations: ['user', 'post', 'post.user'],
     })
-    if (newMessageData == null) {
-      throw createError('Message data does not exist', 422)
-    }
-
     return newMessageData
+  }
+  static async getMessages(params: GetMessagesParams) {
+    const roomId = params.roomId
+    if (roomId == null) {
+      throw createError('RoomId does not exist', 422)
+    }
+    const { pagination = {} } = params
+    let query = Message.createQueryBuilder('message')
+      .leftJoinAndSelect('message.user', 'messageUser')
+      .leftJoinAndSelect('message.post', 'post')
+      .leftJoinAndSelect('post.user', 'postUser')
+      .where('message.roomId = :roomId', { roomId })
+    query = applyPagination(query, pagination)
+    const messages = await query.getMany()
+    return messages
   }
 }
