@@ -6,20 +6,35 @@ import { RoomUser } from 'src/entity/RoomUser'
 import { PaginationParams } from 'src/types/paginationParams.type'
 import { applyPagination } from 'src/utils/paginationUtils'
 import { RoomService } from './RoomService'
+import { validateEmpty } from 'src/utils/validateUtils/validateEmpty'
+import { validateNull } from 'src/utils/validateUtils/validateNull'
 
 type GetMessagesParams = {
   pagination?: PaginationParams
   roomId?: string
 }
+
 export class MessageService {
   static messageRepo = getMessageRepository()
   static roomRepo = getRoomRepository()
+  static validateMessageData(content: string, id: string | number) {
+    validateNull(
+      { name: 'Message', value: content, status: 422 },
+      {
+        name: typeof id === 'string' ? 'roomId' : 'postId',
+        value: id,
+        status: 422,
+      }
+    )
+    validateEmpty({ name: 'Message', value: content.trim(), status: 422 })
+  }
 
   static async createMessage(
     content: string,
     roomId: string,
     userId: number
   ): Promise<Message> {
+    this.validateMessageData(content, roomId)
     const roomUsers = await RoomUser.find({
       where: { roomId: roomId },
     })
@@ -45,6 +60,7 @@ export class MessageService {
     postId: number,
     userId: number
   ): Promise<Message> {
+    this.validateMessageData(content, postId)
     // post取得
     const post = await Post.findOneOrFail({
       where: { id: postId },
