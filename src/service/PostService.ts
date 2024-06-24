@@ -67,7 +67,10 @@ export class PostService {
       where: { id: postId, userId },
     })
     if (post == null) {
-      throw createError('Post does not exist', 404)
+      throw createError(
+        'Post does not exist or you do not have permission to access post',
+        404
+      )
     }
     await Post.delete({ id: postId })
     return
