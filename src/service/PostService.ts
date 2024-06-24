@@ -2,6 +2,16 @@ import { validateEmpty } from 'src/utils/validateUtils/validateEmpty'
 import { getPostRepository } from '../utils/getRepository'
 import { validateNull } from 'src/utils/validateUtils/validateNull'
 import { Post } from 'src/entity/Post'
+import { PaginationParams } from 'src/types/paginationParams.type'
+import { applyPagination } from 'src/utils/paginationUtils'
+
+type FilterParams = {
+  userId?: number
+}
+type GetPostsParams = {
+  pagination?: PaginationParams
+  filter?: FilterParams
+}
 
 export class PostService {
   static postRepo = getPostRepository()
@@ -11,7 +21,7 @@ export class PostService {
     validateEmpty({ name: 'Post', value: body.trim(), status: 422 })
   }
 
-  static async createPost(post: Post, userId: number) {
+  static async createPost(post: Post, userId: number): Promise<Post> {
     if (post.body !== undefined) {
       this.validatePostData(post.body)
     }
@@ -22,5 +32,23 @@ export class PostService {
       relations: ['user'],
     })
     return newPostData
+  }
+  static async getPosts(params: GetPostsParams): Promise<Post[]> {
+    const { pagination = {}, filter: { userId } = {} } = params
+
+    let query = Post.createQueryBuilder('post').leftJoinAndSelect(
+      'post.user',
+      'user'
+    )
+
+    if (userId !== undefined) {
+      query = query.where('post.userId = :userId', { userId })
+    }
+
+    // ページネーションを適用
+    query = applyPagination(query, pagination)
+
+    const posts = await query.getMany()
+    return posts
   }
 }
