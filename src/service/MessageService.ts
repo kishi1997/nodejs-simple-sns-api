@@ -5,7 +5,7 @@ import { Message } from 'src/entity/Message'
 import { RoomUser } from 'src/entity/RoomUser'
 import { PaginationParams } from 'src/types/paginationParams.type'
 import { applyPagination } from 'src/utils/paginationUtils'
-import { validateNull } from 'src/utils/validateUtils/validateNull'
+import { RoomService } from './RoomService'
 
 type GetMessagesParams = {
   pagination?: PaginationParams
@@ -15,7 +15,11 @@ export class MessageService {
   static messageRepo = getMessageRepository()
   static roomRepo = getRoomRepository()
 
-  static async createMessage(content: string, roomId: string, userId: number) {
+  static async createMessage(
+    content: string,
+    roomId: string,
+    userId: number
+  ): Promise<Message> {
     const roomUsers = await RoomUser.find({
       where: { roomId: roomId },
     })
@@ -40,7 +44,7 @@ export class MessageService {
     content: string,
     postId: number,
     userId: number
-  ) {
+  ): Promise<Message> {
     // post取得
     const post = await Post.findOneOrFail({
       where: { id: postId },
@@ -51,9 +55,12 @@ export class MessageService {
       .sort((a, b) => a - b)
       .join('-')
     // ルームの取得
-    let room = await this.roomRepo.findOneOrFail({
+    let room = await this.roomRepo.findOne({
       where: { usersId: formattedUserIds },
     })
+    if (room == null) {
+      room = await RoomService.createRoom(userIds, userId)
+    }
     // メッセージの作成と保存
     const newMessage = this.messageRepo.create({
       content,
@@ -69,11 +76,15 @@ export class MessageService {
     })
     return newMessageData
   }
-  static async getMessages(params: GetMessagesParams) {
+  static async getMessages(
+    params: GetMessagesParams,
+    userId: number
+  ): Promise<Message[]> {
     const roomId = params.roomId
-    if (roomId == null) {
-      throw createError('RoomId does not exist', 422)
-    }
+    // ユーザーがルームに所属していることを確認
+    await RoomUser.findOneOrFail({
+      where: { roomId, userId },
+    })
     const { pagination = {} } = params
     let query = Message.createQueryBuilder('message')
       .leftJoinAndSelect('message.user', 'messageUser')
