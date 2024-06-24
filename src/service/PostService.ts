@@ -53,17 +53,21 @@ export class PostService {
     return posts
   }
   static async findPost(postId: number): Promise<Post> {
-    const post = await Post.findOneOrFail({
+    const post = await Post.findOne({
       where: { id: postId },
       relations: ['user'],
     })
-
+    if (post == null) {
+      throw createError('Post does not exist', 404)
+    }
     return post
   }
-  static async deletePost(postId: number, userId: number) {
-    const post = await this.postRepo.findOne({ where: { id: postId, userId } })
+  static async deletePost(postId: number, userId: number): Promise<void> {
+    const post = await this.postRepo.findOne({
+      where: { id: postId, userId },
+    })
     if (post == null) {
-      throw createError('Failed to delete post', 404)
+      throw createError('Post does not exist', 404)
     }
     await Post.delete({ id: postId })
     return

@@ -56,11 +56,11 @@ PostContoroller.delete(
   '/:id',
   verifyToken,
   authAdmin,
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const postId = req.params.id
-      const postIdNumber = parseInt(postId, 10)
-      await PostService.deletePost(postIdNumber, (req as any).userId)
+      const postId = parseInt(req.params.id)
+      const userId = req.userId
+      await PostService.deletePost(postId, userId!)
       res.json({ success: true })
     } catch (error) {
       next(error)
