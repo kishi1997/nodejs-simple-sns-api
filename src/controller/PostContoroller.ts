@@ -4,6 +4,7 @@ import { authAdmin, verifyToken } from 'src/authMiddleware/auth'
 import { Post } from 'src/entity/Post'
 import { PostService } from 'src/service/PostService'
 import { formatPostResponse } from 'src/utils/responseUtils/formatPostResponse'
+import { validateUserPostOwnership } from 'src/utils/validateUtils/validateUser'
 
 export const PostContoroller = express.Router()
 
@@ -60,7 +61,8 @@ PostContoroller.delete(
     try {
       const postId = parseInt(req.params.id)
       const userId = req.userId
-      await PostService.deletePost(postId, userId!)
+      await validateUserPostOwnership(postId, userId!)
+      await PostService.deletePost(postId)
       res.json({ success: true })
     } catch (error) {
       next(error)
