@@ -6,8 +6,7 @@ import { RoomUser } from 'src/entity/RoomUser'
 import { PaginationParams } from 'src/types/paginationParams.type'
 import { applyPagination } from 'src/utils/paginationUtils'
 import { RoomService } from './RoomService'
-import { validateEmpty } from 'src/utils/validateUtils/validateEmpty'
-import { validateNull } from 'src/utils/validateUtils/validateNull'
+import { joinNumbersWithHyphen } from 'src/utils/arrayUtils'
 
 type GetMessagesParams = {
   pagination?: PaginationParams
@@ -17,7 +16,6 @@ type GetMessagesParams = {
 export class MessageService {
   static messageRepo = getMessageRepository()
   static roomRepo = getRoomRepository()
-
   static async createMessage(
     content: string,
     roomId: string,
@@ -48,18 +46,15 @@ export class MessageService {
     postId: number,
     userId: number
   ): Promise<Message> {
-    // post取得
     const post = await Post.findOneOrFail({
       where: { id: postId },
       relations: ['user'],
     })
-    const userIds = [post.user?.id as number, userId]
-    const formattedUserIds = Array.from(userIds)
-      .sort((a, b) => a - b)
-      .join('-')
+    const userIds = [post.userId!, userId]
+    const roomUsersId = joinNumbersWithHyphen(userIds)
     // ルームの取得
     let room = await this.roomRepo.findOne({
-      where: { usersId: formattedUserIds },
+      where: { usersId: roomUsersId },
     })
     if (room == null) {
       room = await RoomService.createRoom(userIds, userId)
