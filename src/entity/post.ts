@@ -1,26 +1,38 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, IntegerType, OneToMany, CreateDateColumn, } from "typeorm"
-import { User } from "./User";
-import { Message } from "./Message";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { User } from './User'
+import { Message } from './Message'
 
 @Entity()
 export class Post extends BaseEntity {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number
 
-    @Column({
-        default: '',
-    })
-    body?: string;
+  @Column({
+    default: '',
+  })
+  body?: string
 
-    @Column()
-    userId?: number;
+  @Column()
+  userId?: number
 
-    @CreateDateColumn()
-    readonly createdDate?: Date
+  @CreateDateColumn()
+  readonly createdDate?: Date
 
-    @ManyToOne(() => User, (user) => user.post)
-    user?: User;
+  @UpdateDateColumn()
+  readonly updatedDate?: Date
 
-    @OneToMany(() => Message, (message) => message.post)
-    messages?: Message[];
+  @ManyToOne(() => User, user => user.post)
+  user?: User
+
+  @OneToMany(() => Message, message => message.post)
+  messages?: Message[]
 }
