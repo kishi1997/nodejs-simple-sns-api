@@ -51,10 +51,10 @@ export class MessageService {
       relations: ['user'],
     })
     const userIds = [post.userId!, userId]
-    const roomUsersId = joinNumbersWithHyphen(userIds)
+    const roomUserIds = joinNumbersWithHyphen(userIds)
     // ルームの取得
     let room = await this.roomRepo.findOne({
-      where: { usersId: roomUsersId },
+      where: { usersId: roomUserIds },
     })
     if (room == null) {
       room = await RoomService.createRoom(userIds, userId)
