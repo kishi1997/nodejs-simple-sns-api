@@ -4,6 +4,7 @@ import {
 } from 'src/utils/getRepository'
 import { Room } from 'src/entity/Room'
 import { createError } from 'src/utils/errorUtils/createError'
+import { RoomUser } from 'src/entity/RoomUser'
 export class RoomService {
   static roomRepo = getRoomRepository()
   static roomUserRepo = getRoomUserRepository()
@@ -32,32 +33,37 @@ export class RoomService {
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
     if (roomWithRelations == null) {
-      throw createError('New room does not exist', 422)
+      throw createError('New room does not exist', 404)
     }
     return roomWithRelations
   }
-  static async getRooms() {
+  static async getRooms(userId: number) {
+    const roomUserData = await RoomUser.find({
+      where: { userId },
+    })
+    const roomIds = roomUserData.map((data: RoomUser) => {
+      return data.roomId
+    })
     const rooms = await Room.createQueryBuilder('room')
       .leftJoinAndSelect('room.messages', 'message')
       .leftJoinAndSelect('room.roomUsers', 'roomUser')
       .leftJoinAndSelect('roomUser.user', 'user')
+      .where('room.id IN (:...roomIds)', { roomIds })
       .groupBy('room.id, message.id, roomUser.id, user.id')
       .orderBy('MAX(message.createdDate)', 'DESC')
       .getMany()
 
-    if (rooms == null) {
-      throw createError('Rooms do not exist', 422)
-    }
     return rooms
   }
-  static async findRoom(roomId: string) {
-    const room = await Room.findOne({
+  static async findRoom(roomId: string, userId: number) {
+    // ユーザーがルームに所属していることを確認
+    await RoomUser.findOneOrFail({
+      where: { roomId, userId },
+    })
+    const room = await Room.findOneOrFail({
       where: { id: roomId },
       relations: ['messages', 'roomUsers', 'roomUsers.user'],
     })
-    if (room == null) {
-      throw createError('Room does not exist', 422)
-    }
     return room
   }
 }

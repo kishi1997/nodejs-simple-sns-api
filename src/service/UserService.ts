@@ -26,6 +26,10 @@ export class UserService {
     })
     validateEmail(email)
   }
+  static async getAccount(userId: number): Promise<User> {
+    const user = await User.findOneOrFail({ where: { id: userId } })
+    return user
+  }
   static async createUser(
     name: string,
     email: string,
