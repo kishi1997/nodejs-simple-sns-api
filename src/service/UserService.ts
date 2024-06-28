@@ -56,18 +56,11 @@ export class UserService {
   }
   static async updateProfile(
     userId: number,
-    name?: string,
-    email?: string,
-    url?: string
+    name: string,
+    email: string
   ): Promise<User> {
-    if (email) validateEmail(email)
-    const updatedUserData = await this.userRepo.update(
-      { id: userId },
-      { name: name, email: email, iconImageUrl: url }
-    )
-    if (updatedUserData.affected === 0) {
-      throw createError('Update failed', 404)
-    }
+    validateEmail(email)
+    await this.userRepo.update({ id: userId }, { name: name, email: email })
     const userData = await this.userRepo.findOneOrFail({
       where: { id: userId },
     })
