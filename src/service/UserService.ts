@@ -15,8 +15,8 @@ export class UserService {
   static validateUserData(name: string, email: string, password: string) {
     validateNull(
       { name: 'Name', value: name, status: 422 },
-      { name: 'Email', value: email, status: 422 },
-      { name: 'Password', value: password, status: 422 }
+      { name: 'Email', value: email, status: 400 },
+      { name: 'Password', value: password, status: 400 }
     )
     validateEmpty({ name: 'Name', value: name.trim(), status: 422 })
     validatePasswordLength({
@@ -30,11 +30,7 @@ export class UserService {
     const user = await User.findOneOrFail({ where: { id: userId } })
     return user
   }
-  static async createUser(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<{ newUser: User; token: string }> {
+  static async createUser(name: string, email: string, password: string) {
     this.validateUserData(name, email, password)
     const existingUser = await User.findOne({ where: { email: email } })
     if (existingUser) {
