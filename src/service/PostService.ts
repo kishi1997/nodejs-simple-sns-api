@@ -4,6 +4,7 @@ import { validateNull } from 'src/utils/validateUtils/validateNull'
 import { Post } from 'src/entity/Post'
 import { PaginationParams } from 'src/types/paginationParams.type'
 import { applyPagination } from 'src/utils/paginationUtils'
+import { createError } from 'src/utils/errorUtils/createError'
 
 type FilterParams = {
   userId?: number
@@ -52,10 +53,17 @@ export class PostService {
     return posts
   }
   static async findPost(postId: number): Promise<Post> {
-    const post = await Post.findOneOrFail({
+    const post = await Post.findOne({
       where: { id: postId },
       relations: ['user'],
     })
+    if (post == null) {
+      throw createError('Post does not exist', 404)
+    }
     return post
+  }
+  static async deletePost(postId: number): Promise<void> {
+    await Post.delete({ id: postId })
+    return
   }
 }
