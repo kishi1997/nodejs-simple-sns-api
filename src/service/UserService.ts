@@ -50,4 +50,16 @@ export class UserService {
     const token = generateToken(newUser.id)
     return { newUser, token }
   }
+  static async updateProfile(
+    userId: number,
+    name: string,
+    email: string
+  ): Promise<User> {
+    validateEmail(email)
+    await this.userRepo.update({ id: userId }, { name: name, email: email })
+    const userData = await this.userRepo.findOneOrFail({
+      where: { id: userId },
+    })
+    return userData
+  }
 }

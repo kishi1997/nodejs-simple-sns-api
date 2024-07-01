@@ -34,3 +34,19 @@ UserContoroller.post('/', async (req, res, next) => {
     next(error)
   }
 })
+UserContoroller.patch(
+  '/profile',
+  verifyToken,
+  authAdmin,
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { name, email } = req.body
+      const userData = await UserService.updateProfile(req.userId!, name, email)
+      res.json({
+        user: formatUserResponse(userData),
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
