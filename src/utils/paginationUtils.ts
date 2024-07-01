@@ -16,3 +16,16 @@ export function applyPagination<T extends ObjectLiteral>(
   }
   return query
 }
+
+export const parsePaginationParams = (
+  queryParams: Record<string, any>
+): PaginationParams => {
+  if (queryParams.pagination == null) return {}
+  const { cursor, isNext, size, order } = queryParams.pagination
+  return {
+    cursor: cursor ? parseInt(cursor) : undefined,
+    size: size ? parseInt(size) : undefined,
+    isNext: isNext != null ? isNext === true || isNext === 'true' : undefined,
+    order: order ? order : undefined,
+  }
+}
