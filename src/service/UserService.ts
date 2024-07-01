@@ -52,11 +52,15 @@ export class UserService {
   }
   static async updateProfile(
     userId: number,
-    name: string,
-    email: string
+    name?: string,
+    email?: string,
+    url?: string
   ): Promise<User> {
-    validateEmail(email)
-    await this.userRepo.update({ id: userId }, { name: name, email: email })
+    if (email) validateEmail(email)
+    await this.userRepo.update(
+      { id: userId },
+      { name: name, email: email, iconImageUrl: url }
+    )
     const userData = await this.userRepo.findOneOrFail({
       where: { id: userId },
     })
