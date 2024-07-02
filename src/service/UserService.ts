@@ -10,6 +10,13 @@ import {
 } from 'src/utils/validateUtils/validateEmpty'
 import { validateNull } from 'src/utils/validateUtils/validateNull'
 
+type UpdateProfileParams = {
+  userId: number
+  name?: string
+  email?: string
+  url?: string
+}
+
 export class UserService {
   static userRepo = getUserRepository()
   static validateUserData(name: string, email: string, password: string) {
@@ -50,17 +57,17 @@ export class UserService {
     const token = generateToken(newUser.id)
     return { newUser, token }
   }
-  static async updateProfile(
-    userId: number,
-    name?: string,
-    email?: string,
-    url?: string
-  ): Promise<User> {
-    if (email) validateEmail(email)
-    await this.userRepo.update(
-      { id: userId },
-      { name: name, email: email, iconImageUrl: url }
-    )
+  static async updateProfile(params: UpdateProfileParams): Promise<User> {
+    const { userId, name, email, url } = params
+    const updateData: Partial<User> = {}
+    if (name !== undefined) updateData.name = name
+    if (email !== undefined) {
+      validateEmail(email)
+      updateData.email = email
+    }
+    if (url !== undefined) updateData.iconImageUrl = url
+
+    await this.userRepo.update({ id: userId }, updateData)
     const userData = await this.userRepo.findOneOrFail({
       where: { id: userId },
     })

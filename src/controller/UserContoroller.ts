@@ -42,7 +42,11 @@ UserContoroller.patch(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { name, email } = req.body
-      const userData = await UserService.updateProfile(req.userId!, name, email)
+      const userData = await UserService.updateProfile({
+        userId: req.userId!,
+        name,
+        email,
+      })
       res.json({
         user: formatUserResponse(userData),
       })
@@ -58,12 +62,10 @@ UserContoroller.patch(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const fileUrl = await uploadFileToLocal(req, res, 'icon')
-      const userData = await UserService.updateProfile(
-        req.userId!,
-        undefined,
-        undefined,
-        fileUrl
-      )
+      const userData = await UserService.updateProfile({
+        userId: req.userId!,
+        url: fileUrl,
+      })
       res.json({
         user: formatUserResponse(userData),
       })
