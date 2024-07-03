@@ -55,11 +55,7 @@ export class RoomService {
 
     return rooms
   }
-  static async findRoom(roomId: string, userId: number) {
-    // ユーザーがルームに所属していることを確認
-    await RoomUser.findOneOrFail({
-      where: { roomId, userId },
-    })
+  static async findRoom(roomId: string) {
     const room = await Room.findOneOrFail({
       where: { id: roomId },
       relations: ['messages', 'roomUsers', 'roomUsers.user'],

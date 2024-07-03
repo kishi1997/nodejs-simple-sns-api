@@ -76,13 +76,8 @@ export class MessageService {
   }
   static async getMessages(
     pagination: PaginationParams,
-    roomId: string,
-    userId: number
+    roomId: string
   ): Promise<Message[]> {
-    // ユーザーがルームに所属していることを確認
-    await RoomUser.findOneOrFail({
-      where: { roomId, userId },
-    })
     let query = Message.createQueryBuilder('message')
       .leftJoinAndSelect('message.user', 'messageUser')
       .leftJoinAndSelect('message.post', 'post')
