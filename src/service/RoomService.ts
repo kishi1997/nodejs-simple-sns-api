@@ -8,7 +8,10 @@ import { RoomUser } from 'src/entity/RoomUser'
 export class RoomService {
   static roomRepo = getRoomRepository()
   static roomUserRepo = getRoomUserRepository()
-  static async createRoom(roomUsersId: number[], userId: number) {
+  static async createRoom(
+    roomUsersId: number[],
+    userId: number
+  ): Promise<Room> {
     const allUserIds = Array.from(new Set([...roomUsersId, userId]))
     const formattedUserIds = Array.from(allUserIds)
       .sort((a, b) => a - b)
@@ -37,7 +40,7 @@ export class RoomService {
     }
     return roomWithRelations
   }
-  static async getRooms(userId: number) {
+  static async getRooms(userId: number): Promise<Room[]> {
     const roomUserData = await RoomUser.find({
       where: { userId },
     })
@@ -55,7 +58,7 @@ export class RoomService {
 
     return rooms
   }
-  static async findRoom(roomId: string) {
+  static async findRoom(roomId: string): Promise<Room> {
     const room = await Room.findOneOrFail({
       where: { id: roomId },
       relations: ['messages', 'roomUsers', 'roomUsers.user'],

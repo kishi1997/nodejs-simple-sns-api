@@ -22,7 +22,13 @@ export class AuthService {
     validateEmail(email)
   }
 
-  static async signIn(email: string, password: string) {
+  static async signIn(
+    email: string,
+    password: string
+  ): Promise<{
+    user: User
+    token: string
+  }> {
     this.validateUserData(email, password)
     const user = await User.findOne({ where: { email } })
     if (user == null) {

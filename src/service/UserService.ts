@@ -37,7 +37,14 @@ export class UserService {
     const user = await User.findOneOrFail({ where: { id: userId } })
     return user
   }
-  static async createUser(name: string, email: string, password: string) {
+  static async createUser(
+    name: string,
+    email: string,
+    password: string
+  ): Promise<{
+    newUser: User
+    token: string
+  }> {
     this.validateUserData(name, email, password)
     const existingUser = await User.findOne({ where: { email: email } })
     if (existingUser) {
