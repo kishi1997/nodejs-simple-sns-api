@@ -4,6 +4,7 @@ import { verifyToken, authAdmin } from 'src/authMiddleware/auth'
 import { Message } from 'src/entity/Message'
 import { MessageService } from 'src/service/MessageService'
 import { formatMessageResponse } from 'src/utils/responseUtils/formatMessageResponse'
+import { parsePaginationParams } from 'src/utils/paginationUtils'
 
 export const MessageContoroller = express.Router()
 MessageContoroller.post(
@@ -51,6 +52,7 @@ MessageContoroller.post(
     }
   }
 )
+
 MessageContoroller.get(
   '/',
   verifyToken,
@@ -58,7 +60,13 @@ MessageContoroller.get(
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.userId
-      const messages = await MessageService.getMessages(req.query, userId!)
+      const roomId = req.query.roomId as string
+      const pagination = parsePaginationParams(req.query)
+      const messages = await MessageService.getMessages(
+        pagination,
+        roomId,
+        userId!
+      )
       const formattedMessagesData = messages.map((message: Message) => {
         return formatMessageResponse(message)
       })
