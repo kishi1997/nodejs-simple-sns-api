@@ -10,7 +10,7 @@ type FilterParams = {
   userId?: number
 }
 type GetPostsParams = {
-  pagination?: PaginationParams
+  pagination: PaginationParams
   filter?: FilterParams
 }
 
@@ -35,8 +35,7 @@ export class PostService {
     return newPostData
   }
   static async getPosts(params: GetPostsParams): Promise<Post[]> {
-    const { pagination = {}, filter: { userId } = {} } = params
-
+    const userId = params.filter?.userId
     let query = Post.createQueryBuilder('post').leftJoinAndSelect(
       'post.user',
       'user'
@@ -47,7 +46,7 @@ export class PostService {
     }
 
     // ページネーションを適用
-    query = applyPagination(query, pagination)
+    query = applyPagination(query, params.pagination)
 
     const posts = await query.getMany()
     return posts

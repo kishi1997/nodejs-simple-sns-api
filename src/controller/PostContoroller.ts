@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import { authAdmin, verifyToken } from 'src/authMiddleware/auth'
 import { Post } from 'src/entity/Post'
 import { PostService } from 'src/service/PostService'
+import { parsePaginationParams } from 'src/utils/paginationUtils'
 import { formatPostResponse } from 'src/utils/responseUtils/formatPostResponse'
 import { validateUserPostOwnership } from 'src/utils/validateUtils/validateUser'
 
@@ -29,7 +30,11 @@ PostContoroller.get(
   authAdmin,
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const posts = await PostService.getPosts(req.query)
+      const pagination = parsePaginationParams(req.query)
+      const posts = await PostService.getPosts({
+        pagination,
+        filter: req.query.filter as any,
+      })
       const formattedPostsData = posts.map((post: Post) => {
         return formatPostResponse(post)
       })
