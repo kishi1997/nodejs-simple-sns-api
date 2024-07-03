@@ -1,72 +1,95 @@
-import { validateNull } from 'src/utils/validateUtils/validateNull'
-import { getMessageRepository } from '../utils/getRepository'
-import { validateEmpty } from 'src/utils/validateUtils/validateEmpty'
-import { User } from 'src/entity/User'
+import { getMessageRepository, getRoomRepository } from '../utils/getRepository'
 import { Post } from 'src/entity/Post'
 import { createError } from 'src/utils/errorUtils/createError'
+import { Message } from 'src/entity/Message'
+import { RoomUser } from 'src/entity/RoomUser'
+import { PaginationParams } from 'src/types/paginationParams.type'
+import { applyPagination } from 'src/utils/paginationUtils'
+import { RoomService } from './RoomService'
+import { joinNumbersWithHyphen } from 'src/utils/arrayUtils'
+
+type GetMessagesParams = {
+  pagination?: PaginationParams
+  roomId?: string
+}
 
 export class MessageService {
   static messageRepo = getMessageRepository()
-
-  static validateMessageData(content: string, roomId: string, postId?: number) {
-    if (postId) {
-      validateNull(
-        { name: 'Message', value: content, status: 422 },
-        { name: 'RoomId', value: roomId, status: 422 },
-        { name: 'postId', value: postId, status: 422 }
-      )
-    } else {
-      validateNull(
-        { name: 'Message', value: content, status: 422 },
-        { name: 'RoomId', value: roomId, status: 422 }
-      )
+  static roomRepo = getRoomRepository()
+  static async createMessage(
+    content: string,
+    roomId: string,
+    userId: number
+  ): Promise<Message> {
+    const roomUsers = await RoomUser.find({
+      where: { roomId: roomId },
+    })
+    const userIds = roomUsers.map(roomUser => roomUser.userId)
+    // 引数のuserIdが配列に含まれているかをチェック
+    if (!userIds.includes(userId)) {
+      throw createError('You are not room member', 422)
     }
-    validateEmpty({ name: 'Message', value: content.trim(), status: 422 })
-  }
-
-  static async createMessage(content: string, roomId: string, userId: number) {
-    this.validateMessageData(content, roomId)
-    const user = await User.findOne({ where: { id: userId } })
-    if (!user) {
-      throw createError('User does not exist', 400)
-    }
-    const newMessage = MessageService.messageRepo.create({
+    const newMessage = this.messageRepo.create({
       content,
       roomId,
       userId,
     })
-    await MessageService.messageRepo.save(newMessage)
-    return { user, newMessage }
+    await this.messageRepo.save(newMessage)
+    const newMessageData = await this.messageRepo.findOneOrFail({
+      where: { id: newMessage.id },
+      relations: ['user'],
+    })
+    return newMessageData
   }
   static async createMessageViaPost(
     content: string,
-    roomId: string,
     postId: number,
     userId: number
-  ) {
-    this.validateMessageData(content, roomId, postId)
-    const user = await User.findOne({ where: { id: userId } })
-    if (!user) {
-      throw createError('User does not exist', 422)
-    }
-    const post = await Post.findOne({
+  ): Promise<Message> {
+    const post = await Post.findOneOrFail({
       where: { id: postId },
       relations: ['user'],
     })
-    if (post == null) {
-      throw createError('Post does not exist', 422)
+    const userIds = [post.userId!, userId]
+    const roomUserIds = joinNumbersWithHyphen(userIds)
+    // ルームの取得
+    let room = await this.roomRepo.findOne({
+      where: { usersId: roomUserIds },
+    })
+    if (room == null) {
+      room = await RoomService.createRoom(userIds, userId)
     }
-    const postUser = post.user
-    if (postUser == null) {
-      throw createError('Post User does not exist', 400)
-    }
-    const newMessage = MessageService.messageRepo.create({
+    // メッセージの作成と保存
+    const newMessage = this.messageRepo.create({
       content,
-      roomId,
       postId,
       userId,
+      roomId: room.id,
     })
-    await MessageService.messageRepo.save(newMessage)
-    return { user, post, postUser, newMessage }
+    await this.messageRepo.save(newMessage)
+    // メッセージデータの取得
+    const newMessageData = await this.messageRepo.findOneOrFail({
+      where: { id: newMessage.id },
+      relations: ['user', 'post', 'post.user'],
+    })
+    return newMessageData
+  }
+  static async getMessages(
+    pagination: PaginationParams,
+    roomId: string,
+    userId: number
+  ): Promise<Message[]> {
+    // ユーザーがルームに所属していることを確認
+    await RoomUser.findOneOrFail({
+      where: { roomId, userId },
+    })
+    let query = Message.createQueryBuilder('message')
+      .leftJoinAndSelect('message.user', 'messageUser')
+      .leftJoinAndSelect('message.post', 'post')
+      .leftJoinAndSelect('post.user', 'postUser')
+      .where('message.roomId = :roomId', { roomId })
+    query = applyPagination(query, pagination)
+    const messages = await query.getMany()
+    return messages
   }
 }
