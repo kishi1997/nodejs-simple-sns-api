@@ -6,7 +6,6 @@ import {
   ManyToOne,
   OneToMany,
   CreateDateColumn,
-  UpdateDateColumn,
 } from 'typeorm'
 import { User } from './User'
 import { Message } from './Message'
@@ -26,9 +25,6 @@ export class Post extends BaseEntity {
 
   @CreateDateColumn()
   readonly createdDate?: Date
-
-  @UpdateDateColumn()
-  readonly updatedDate?: Date
 
   @ManyToOne(() => User, user => user.post)
   user?: User
