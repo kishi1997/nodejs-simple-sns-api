@@ -5,6 +5,7 @@ import { Message } from 'src/entity/Message'
 import { MessageService } from 'src/service/MessageService'
 import { formatMessageResponse } from 'src/utils/responseUtils/formatMessageResponse'
 import { parsePaginationParams } from 'src/utils/paginationUtils'
+import { validateUserRoomMembership } from 'src/utils/validateUtils/validateUser'
 
 export const MessageContoroller = express.Router()
 MessageContoroller.post(
@@ -61,12 +62,9 @@ MessageContoroller.get(
     try {
       const userId = req.userId
       const roomId = req.query.roomId as string
+      await validateUserRoomMembership(roomId, userId!)
       const pagination = parsePaginationParams(req.query)
-      const messages = await MessageService.getMessages(
-        pagination,
-        roomId,
-        userId!
-      )
+      const messages = await MessageService.getMessages(pagination, roomId)
       const formattedMessagesData = messages.map((message: Message) => {
         return formatMessageResponse(message)
       })

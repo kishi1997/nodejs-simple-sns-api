@@ -4,6 +4,7 @@ import { authAdmin, verifyToken } from 'src/authMiddleware/auth'
 import { Room } from 'src/entity/Room'
 import { RoomService } from 'src/service/RoomService'
 import { formatRoomResponse } from 'src/utils/responseUtils/formatRoomResponse'
+import { validateUserRoomMembership } from 'src/utils/validateUtils/validateUser'
 
 export const RoomController = express.Router()
 RoomController.post(
@@ -59,7 +60,8 @@ RoomController.get(
         res.json({ user: null })
         return
       }
-      const roomData = await RoomService.findRoom(roomId, userId)
+      await validateUserRoomMembership(roomId, userId!)
+      const roomData = await RoomService.findRoom(roomId)
       res.json({ room: formatRoomResponse(roomData) })
     } catch (error) {
       next(error)
