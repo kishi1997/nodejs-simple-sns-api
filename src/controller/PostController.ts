@@ -7,9 +7,9 @@ import { parsePaginationParams } from 'src/utils/paginationUtils'
 import { formatPostResponse } from 'src/utils/responseUtils/formatPostResponse'
 import { validateUserPostOwnership } from 'src/utils/validateUtils/validateUser'
 
-export const PostContoroller = express.Router()
+export const PostController = express.Router()
 
-PostContoroller.post(
+PostController.post(
   '/',
   verifyToken,
   authAdmin,
@@ -24,7 +24,7 @@ PostContoroller.post(
     }
   }
 )
-PostContoroller.get(
+PostController.get(
   '/',
   verifyToken,
   authAdmin,
@@ -44,7 +44,7 @@ PostContoroller.get(
     }
   }
 )
-PostContoroller.get(
+PostController.get(
   '/:id',
   verifyToken,
   authAdmin,
@@ -58,7 +58,7 @@ PostContoroller.get(
     }
   }
 )
-PostContoroller.delete(
+PostController.delete(
   '/:id',
   verifyToken,
   authAdmin,

@@ -5,8 +5,8 @@ import { verifyToken, authAdmin } from 'src/authMiddleware/auth'
 import { Request, Response, NextFunction } from 'express'
 import { uploadFileToLocal } from 'src/utils/fileUtils'
 
-export const UserContoroller = express.Router()
-UserContoroller.get(
+export const UserController = express.Router()
+UserController.get(
   '/',
   verifyToken,
   authAdmin,
@@ -21,7 +21,7 @@ UserContoroller.get(
     }
   }
 )
-UserContoroller.post(
+UserController.post(
   '/',
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -38,7 +38,7 @@ UserContoroller.post(
     }
   }
 )
-UserContoroller.patch(
+UserController.patch(
   '/profile',
   verifyToken,
   authAdmin,
@@ -58,7 +58,7 @@ UserContoroller.patch(
     }
   }
 )
-UserContoroller.patch(
+UserController.patch(
   '/icon_image',
   verifyToken,
   authAdmin,

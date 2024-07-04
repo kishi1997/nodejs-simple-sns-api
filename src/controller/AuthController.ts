@@ -3,9 +3,9 @@ import { Request, Response, NextFunction } from 'express'
 import { AuthService } from '../service/AuthService'
 import { formatUserResponse } from 'src/utils/responseUtils/formatUserResponse'
 
-export const AuthContoroller = express.Router()
+export const AuthController = express.Router()
 
-AuthContoroller.post(
+AuthController.post(
   '/',
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

@@ -1,16 +1,16 @@
-import express from 'express';
-import { PostContoroller } from './controller/PostContoroller';
-import { UserContoroller } from './controller/UserContoroller';
-import { AuthContoroller } from './controller/AuthContoroller';
-import { MessageContoroller } from './controller/MessageContoroller';
-import { RoomController } from './controller/RoomContorller';
+import express from 'express'
+import { PostController } from './controller/PostController'
+import { UserController } from './controller/UserController'
+import { AuthController } from './controller/AuthController'
+import { MessageController } from './controller/MessageController'
+import { RoomController } from './controller/RoomController'
 
-const router = express.Router();
+const router = express.Router()
 
-router.use('/posts', PostContoroller);
-router.use('/account', UserContoroller);
-router.use('/auth', AuthContoroller);
-router.use('/messages', MessageContoroller);
-router.use('/rooms', RoomController);
+router.use('/posts', PostController)
+router.use('/account', UserController)
+router.use('/auth', AuthController)
+router.use('/messages', MessageController)
+router.use('/rooms', RoomController)
 
-export default router;
+export default router

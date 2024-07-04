@@ -7,8 +7,8 @@ import { formatMessageResponse } from 'src/utils/responseUtils/formatMessageResp
 import { parsePaginationParams } from 'src/utils/paginationUtils'
 import { validateUserRoomMembership } from 'src/utils/validateUtils/validateUser'
 
-export const MessageContoroller = express.Router()
-MessageContoroller.post(
+export const MessageController = express.Router()
+MessageController.post(
   '/',
   verifyToken,
   authAdmin,
@@ -31,7 +31,7 @@ MessageContoroller.post(
   }
 )
 
-MessageContoroller.post(
+MessageController.post(
   '/via_post',
   verifyToken,
   authAdmin,
@@ -54,7 +54,7 @@ MessageContoroller.post(
   }
 )
 
-MessageContoroller.get(
+MessageController.get(
   '/',
   verifyToken,
   authAdmin,
